@@ -2,6 +2,7 @@ package com.gtirkha.notification_badge.pigeon
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Log
 import androidx.core.content.edit
 import com.gtirkha.notification_badge.badge_provider.BadgeProvider
@@ -93,5 +94,9 @@ class NotificationBadgeApiImpl(context: Context) : NotificationBadgeApi {
         val count = prefs.getInt(badgePrefsKey, 0)
         Log.d(tag, "getBadgeCount returning: $count")
         return count.toLong()
+    }
+
+    override fun getDeviceManufacturer(): String {
+        return Build.MANUFACTURER
     }
 }

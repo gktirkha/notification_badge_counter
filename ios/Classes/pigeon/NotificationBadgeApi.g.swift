@@ -90,6 +90,7 @@ protocol NotificationBadgeApi {
   func setCount(count: Int64) throws -> Bool
   func isSupported() throws -> Bool
   func getBadgeCount() throws -> Int64
+  func getDeviceManufacturer() throws -> String
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -138,6 +139,19 @@ class NotificationBadgeApiSetup {
       }
     } else {
       getBadgeCountChannel.setMessageHandler(nil)
+    }
+    let getDeviceManufacturerChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.getDeviceManufacturer\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getDeviceManufacturerChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.getDeviceManufacturer()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getDeviceManufacturerChannel.setMessageHandler(nil)
     }
   }
 }
