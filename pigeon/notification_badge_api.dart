@@ -9,6 +9,7 @@ import 'package:pigeon/pigeon.dart';
     kotlinOptions: KotlinOptions(package: "com.gtirkha.notification_badge"),
     swiftOut: 'ios/Classes/pigeon/NotificationBadgeApi.g.swift',
     swiftOptions: SwiftOptions(),
+    dartPackageName: 'notification_badge',
   ),
 )
 @HostApi()
