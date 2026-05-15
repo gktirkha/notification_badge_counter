@@ -59,9 +59,10 @@ private open class NotificationBadgeApiPigeonCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface NotificationBadgeApi {
-  fun setCount(count: Long, callback: (Result<Boolean>) -> Unit)
   fun isSupported(callback: (Result<Boolean>) -> Unit)
+  fun setCount(count: Long, callback: (Result<Boolean>) -> Unit)
   fun getBadgeCount(callback: (Result<Long>) -> Unit)
+  fun clearBadge(callback: (Result<Boolean>) -> Unit)
   fun getDeviceManufacturer(callback: (Result<String>) -> Unit)
   fun incrementCount(callback: (Result<Boolean>) -> Unit)
   fun decrementCount(callback: (Result<Boolean>) -> Unit)
@@ -77,6 +78,24 @@ interface NotificationBadgeApi {
     @JvmOverloads
     fun setUp(binaryMessenger: BinaryMessenger, api: NotificationBadgeApi?, messageChannelSuffix: String = "") {
       val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.isSupported$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.isSupported{ result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(NotificationBadgeApiPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(NotificationBadgeApiPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.setCount$separatedMessageChannelSuffix", codec)
         if (api != null) {
@@ -98,10 +117,10 @@ interface NotificationBadgeApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.isSupported$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.getBadgeCount$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.isSupported{ result: Result<Boolean> ->
+            api.getBadgeCount{ result: Result<Long> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(NotificationBadgeApiPigeonUtils.wrapError(error))
@@ -116,10 +135,10 @@ interface NotificationBadgeApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.getBadgeCount$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.clearBadge$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.getBadgeCount{ result: Result<Long> ->
+            api.clearBadge{ result: Result<Boolean> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(NotificationBadgeApiPigeonUtils.wrapError(error))

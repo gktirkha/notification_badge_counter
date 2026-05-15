@@ -103,7 +103,7 @@ class _BadgeDemoPageState extends State<BadgeDemoPage> {
   }
 
   Future<void> _clear() async {
-    final success = await _badge.setCount(0);
+    final success = await _badge.clearBadge();
     if (success) await _refreshCount();
     setState(
       () => _status = success ? 'Badge cleared' : 'Failed to clear badge',

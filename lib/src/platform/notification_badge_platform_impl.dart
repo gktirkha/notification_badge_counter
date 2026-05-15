@@ -46,4 +46,9 @@ class NotificationBadgePlatformImpl
   Future<bool> setCount(int count) async {
     return await _api.setCount(count);
   }
+
+  @override
+  Future<bool> clearBadge() async {
+    return await _api.clearBadge();
+  }
 }

@@ -133,4 +133,8 @@ class NotificationBadgeApiImpl(context: Context) : NotificationBadgeApi {
     override fun requestPermissions(callback: (Result<Boolean>) -> Unit) {
         return callback(Result.success(true))
     }
+
+    override fun clearBadge(callback: (Result<Boolean>) -> Unit) {
+        setCount(0, callback)
+    }
 }

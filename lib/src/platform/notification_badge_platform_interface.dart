@@ -1,5 +1,6 @@
-import 'notification_badge_platform_impl.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
+import 'notification_badge_platform_impl.dart';
 
 /// The interface that platform implementations must extend.
 abstract class NotificationBadgePlatformInterface extends PlatformInterface {
@@ -45,4 +46,7 @@ abstract class NotificationBadgePlatformInterface extends PlatformInterface {
   ///
   /// Returns `true` if permission was granted.
   Future<bool> requestPermissions();
+
+  /// Clears the badge by setting the count to 0. Returns `true` on success.
+  Future<bool> clearBadge();
 }

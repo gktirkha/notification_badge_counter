@@ -88,9 +88,10 @@ class NotificationBadgeApiPigeonCodec: FlutterStandardMessageCodec, @unchecked S
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol NotificationBadgeApi {
-  func setCount(count: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
   func isSupported(completion: @escaping (Result<Bool, Error>) -> Void)
+  func setCount(count: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
   func getBadgeCount(completion: @escaping (Result<Int64, Error>) -> Void)
+  func clearBadge(completion: @escaping (Result<Bool, Error>) -> Void)
   func getDeviceManufacturer(completion: @escaping (Result<String, Error>) -> Void)
   func incrementCount(completion: @escaping (Result<Bool, Error>) -> Void)
   func decrementCount(completion: @escaping (Result<Bool, Error>) -> Void)
@@ -104,6 +105,21 @@ class NotificationBadgeApiSetup {
   /// Sets up an instance of `NotificationBadgeApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: NotificationBadgeApi?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+    let isSupportedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.isSupported\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isSupportedChannel.setMessageHandler { _, reply in
+        api.isSupported { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      isSupportedChannel.setMessageHandler(nil)
+    }
     let setCountChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.setCount\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       setCountChannel.setMessageHandler { message, reply in
@@ -121,21 +137,6 @@ class NotificationBadgeApiSetup {
     } else {
       setCountChannel.setMessageHandler(nil)
     }
-    let isSupportedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.isSupported\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      isSupportedChannel.setMessageHandler { _, reply in
-        api.isSupported { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      isSupportedChannel.setMessageHandler(nil)
-    }
     let getBadgeCountChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.getBadgeCount\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getBadgeCountChannel.setMessageHandler { _, reply in
@@ -150,6 +151,21 @@ class NotificationBadgeApiSetup {
       }
     } else {
       getBadgeCountChannel.setMessageHandler(nil)
+    }
+    let clearBadgeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.clearBadge\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      clearBadgeChannel.setMessageHandler { _, reply in
+        api.clearBadge { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      clearBadgeChannel.setMessageHandler(nil)
     }
     let getDeviceManufacturerChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.getDeviceManufacturer\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

@@ -49,4 +49,9 @@ class NotificationBadge {
   Future<bool> setCount(int count) async {
     return await _instance.setCount(count);
   }
+
+  /// Clears the badge by setting the count to 0. Returns `true` on success.
+  Future<bool> clearBadge() async {
+    return await _instance.clearBadge();
+  }
 }
