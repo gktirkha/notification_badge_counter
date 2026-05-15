@@ -3,13 +3,15 @@ package com.gtirkha.notification_badge.badge_provider
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.net.toUri
 
 class SamsungBadgeProvider(private val context: Context) : BadgeProvider {
 
     companion object {
-        private const val SAMSUNG_CONTENT_URI = "content://com.sec.android.provider.badge/apps"
+        private const val SAMSUNG_BADGE_PROVIDER = "com.sec.android.provider.badge"
+        private const val SAMSUNG_CONTENT_URI = "content://$SAMSUNG_BADGE_PROVIDER/apps"
     }
 
     override fun isSupported(): Boolean {
@@ -18,7 +20,15 @@ class SamsungBadgeProvider(private val context: Context) : BadgeProvider {
 
         if (!isSamsung) return false
 
-        // Check if Samsung badge provider is available
+        val providerInstalled = try {
+            context.packageManager.getPackageInfo(SAMSUNG_BADGE_PROVIDER, PackageManager.GET_PROVIDERS)
+            true
+        } catch (_: PackageManager.NameNotFoundException) {
+            false
+        }
+
+        if (!providerInstalled) return false
+
         return try {
             val uri = SAMSUNG_CONTENT_URI.toUri()
             context.contentResolver.query(uri, null, null, null, null)?.use { true } ?: false
@@ -39,14 +49,13 @@ class SamsungBadgeProvider(private val context: Context) : BadgeProvider {
             val result = context.contentResolver.insert(uri, contentValues)
             result != null
         } catch (_: Exception) {
-            // Try alternative method for newer Samsung devices
             tryAlternativeSamsungMethod(count)
         }
     }
 
     private fun tryAlternativeSamsungMethod(count: Int): Boolean {
         return try {
-            val uri = "content://com.sec.android.provider.badge/apps?notify=true".toUri()
+            val uri = "content://$SAMSUNG_BADGE_PROVIDER/apps?notify=true".toUri()
             val contentValues = ContentValues().apply {
                 put("package", context.packageName)
                 put("class", getLauncherActivityClass())
