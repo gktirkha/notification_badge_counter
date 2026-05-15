@@ -22,7 +22,7 @@ class VivoBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Try alternative method
             tryVivoAlternative(count)
         }
@@ -38,7 +38,7 @@ class VivoBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

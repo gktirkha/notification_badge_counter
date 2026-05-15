@@ -25,7 +25,7 @@ class OppoBadgeProvider(private val context: Context) : BadgeProvider {
             }
 
             false
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -41,7 +41,7 @@ class OppoBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -56,7 +56,7 @@ class OppoBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

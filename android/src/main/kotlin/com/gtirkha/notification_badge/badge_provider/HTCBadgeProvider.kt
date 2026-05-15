@@ -21,7 +21,7 @@ class HTCBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             tryAlternativeHTCMethod(count)
         }
     }
@@ -38,7 +38,7 @@ class HTCBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

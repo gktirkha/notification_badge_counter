@@ -15,8 +15,7 @@ class SonyBadgeProvider(private val context: Context) : BadgeProvider {
         return try {
             val intent = Intent("com.sonyericsson.home.action.UPDATE_BADGE").apply {
                 putExtra(
-                    "com.sonyericsson.home.intent.extra.badge.PACKAGE_NAME",
-                    context.packageName
+                    "com.sonyericsson.home.intent.extra.badge.PACKAGE_NAME", context.packageName
                 )
                 putExtra(
                     "com.sonyericsson.home.intent.extra.badge.ACTIVITY_NAME",
@@ -28,7 +27,7 @@ class SonyBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             tryAlternativeSonyMethod(count)
         }
     }
@@ -47,7 +46,7 @@ class SonyBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

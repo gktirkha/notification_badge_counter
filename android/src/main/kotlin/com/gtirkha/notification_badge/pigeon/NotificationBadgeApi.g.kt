@@ -62,6 +62,8 @@ interface NotificationBadgeApi {
   fun isSupported(): Boolean
   fun getBadgeCount(): Long
   fun getDeviceManufacturer(): String
+  fun incrementCount(): Boolean
+  fun decrementCount(): Boolean
 
   companion object {
     /** The codec used by NotificationBadgeApi. */
@@ -125,6 +127,36 @@ interface NotificationBadgeApi {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
               listOf(api.getDeviceManufacturer())
+            } catch (exception: Throwable) {
+              NotificationBadgeApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.incrementCount$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.incrementCount())
+            } catch (exception: Throwable) {
+              NotificationBadgeApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.decrementCount$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.decrementCount())
             } catch (exception: Throwable) {
               NotificationBadgeApiPigeonUtils.wrapError(exception)
             }

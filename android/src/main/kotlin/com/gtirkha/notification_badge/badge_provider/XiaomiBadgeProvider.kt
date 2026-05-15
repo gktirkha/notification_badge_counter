@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import androidx.core.net.toUri
 
 class XiaomiBadgeProvider(private val context: Context) : BadgeProvider {
     override fun isSupported(): Boolean {
@@ -38,7 +39,7 @@ class XiaomiBadgeProvider(private val context: Context) : BadgeProvider {
             val properties = System.getProperties()
             val miuiVersion = properties.getProperty("ro.miui.ui.version.name")
             miuiVersion != null
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -51,7 +52,7 @@ class XiaomiBadgeProvider(private val context: Context) : BadgeProvider {
                 putInt("badgenumber", count)
             }
             context.contentResolver.call(
-                android.net.Uri.parse("content://com.miui.home.launcher.provider"),
+                "content://com.miui.home.launcher.provider".toUri(),
                 "setAppBadgeCount",
                 null,
                 bundle

@@ -26,7 +26,7 @@ class NovaLauncherBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -41,7 +41,7 @@ class NovaLauncherBadgeProvider(private val context: Context) : BadgeProvider {
                 @Suppress("DEPRECATION") context.packageManager.getPackageInfo(packageName, 0)
             }
             true
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (_: PackageManager.NameNotFoundException) {
             false
         }
     }

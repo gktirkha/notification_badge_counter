@@ -20,4 +20,6 @@ abstract class NotificationBadgeApi {
   bool isSupported();
   int getBadgeCount();
   String getDeviceManufacturer();
+  bool incrementCount();
+  bool decrementCount();
 }

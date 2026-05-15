@@ -3,9 +3,9 @@ package com.gtirkha.notification_badge.badge_provider
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import androidx.core.net.toUri
 
 class HuaweiBadgeProvider(private val context: Context) : BadgeProvider {
 
@@ -27,7 +27,7 @@ class HuaweiBadgeProvider(private val context: Context) : BadgeProvider {
             }
 
             false
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -40,10 +40,10 @@ class HuaweiBadgeProvider(private val context: Context) : BadgeProvider {
                 put("badgenumber", count)
             }
 
-            val uri = Uri.parse("content://com.huawei.android.launcher.settings/badge/")
+            val uri = "content://com.huawei.android.launcher.settings/badge/".toUri()
             val result = context.contentResolver.insert(uri, contentValues)
             result != null
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -63,7 +63,7 @@ class HuaweiBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

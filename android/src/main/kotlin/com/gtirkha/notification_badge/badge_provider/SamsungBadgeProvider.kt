@@ -22,7 +22,7 @@ class SamsungBadgeProvider(private val context: Context) : BadgeProvider {
         return try {
             val uri = SAMSUNG_CONTENT_URI.toUri()
             context.contentResolver.query(uri, null, null, null, null)?.use { true } ?: false
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -38,7 +38,7 @@ class SamsungBadgeProvider(private val context: Context) : BadgeProvider {
 
             val result = context.contentResolver.insert(uri, contentValues)
             result != null
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Try alternative method for newer Samsung devices
             tryAlternativeSamsungMethod(count)
         }
@@ -55,7 +55,7 @@ class SamsungBadgeProvider(private val context: Context) : BadgeProvider {
 
             val result = context.contentResolver.insert(uri, contentValues)
             result != null
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

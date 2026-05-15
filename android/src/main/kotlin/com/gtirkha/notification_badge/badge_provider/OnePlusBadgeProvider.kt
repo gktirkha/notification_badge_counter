@@ -22,7 +22,7 @@ class OnePlusBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Try OxygenOS alternative
             tryOxygenOSMethod(count)
         }
@@ -40,7 +40,7 @@ class OnePlusBadgeProvider(private val context: Context) : BadgeProvider {
 
             context.sendBroadcast(intent)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }

@@ -67,7 +67,7 @@ class NotificationBadgeApiImpl(context: Context) : NotificationBadgeApi {
             }
             Log.d(tag, "setBadgeCount completed. Success: $anySuccess")
             return anySuccess
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return false
         }
 
@@ -98,5 +98,13 @@ class NotificationBadgeApiImpl(context: Context) : NotificationBadgeApi {
 
     override fun getDeviceManufacturer(): String {
         return Build.MANUFACTURER
+    }
+
+    override fun incrementCount(): Boolean {
+        return setCount(getBadgeCount() + 1)
+    }
+
+    override fun decrementCount(): Boolean {
+        return setCount(getBadgeCount() - 1)
     }
 }

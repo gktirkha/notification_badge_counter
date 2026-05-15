@@ -91,6 +91,8 @@ protocol NotificationBadgeApi {
   func isSupported() throws -> Bool
   func getBadgeCount() throws -> Int64
   func getDeviceManufacturer() throws -> String
+  func incrementCount() throws -> Bool
+  func decrementCount() throws -> Bool
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -152,6 +154,32 @@ class NotificationBadgeApiSetup {
       }
     } else {
       getDeviceManufacturerChannel.setMessageHandler(nil)
+    }
+    let incrementCountChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.incrementCount\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      incrementCountChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.incrementCount()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      incrementCountChannel.setMessageHandler(nil)
+    }
+    let decrementCountChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.decrementCount\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      decrementCountChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.decrementCount()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      decrementCountChannel.setMessageHandler(nil)
     }
   }
 }
