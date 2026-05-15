@@ -1,47 +1,49 @@
 import '../pigeon/notification_badge_api.g.dart';
 import 'notification_badge_platform_interface.dart';
 
+/// Default implementation of [NotificationBadgePlatformInterface] using the
+/// Pigeon-generated [NotificationBadgeApi].
 class NotificationBadgePlatformImpl
     implements NotificationBadgePlatformInterface {
-  final api = NotificationBadgeApi();
+  final _api = NotificationBadgeApi();
 
   @override
   Future<bool> checkPermissions() async {
-    return await api.checkPermissions();
+    return await _api.checkPermissions();
   }
 
   @override
   Future<bool> decrementCount() async {
-    return await api.decrementCount();
+    return await _api.decrementCount();
   }
 
   @override
   Future<int> getBadgeCount() async {
-    return await api.getBadgeCount();
+    return await _api.getBadgeCount();
   }
 
   @override
   Future<String> getDeviceManufacturer() async {
-    return await api.getDeviceManufacturer();
+    return await _api.getDeviceManufacturer();
   }
 
   @override
   Future<bool> incrementCount() async {
-    return await api.incrementCount();
+    return await _api.incrementCount();
   }
 
   @override
   Future<bool> isSupported() async {
-    return await api.isSupported();
+    return await _api.isSupported();
   }
 
   @override
   Future<bool> requestPermissions() async {
-    return await api.requestPermissions();
+    return await _api.requestPermissions();
   }
 
   @override
   Future<bool> setCount(int count) async {
-    return await api.setCount(count);
+    return await _api.setCount(count);
   }
 }
