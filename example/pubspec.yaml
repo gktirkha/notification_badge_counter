@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  notification_badge:
+  notification_badge_counter:
     path: ../
 
   cupertino_icons: ^1.0.8

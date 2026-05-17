@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notification_badge/notification_badge.dart';
+import 'package:notification_badge_counter/notification_badge.dart';
 
 void main() {
   runApp(const MyApp());
