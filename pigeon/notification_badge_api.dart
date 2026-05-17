@@ -2,7 +2,7 @@ import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(
   PigeonOptions(
-    dartOut: 'lib/src/pigeon/notification_badge_api.dart',
+    dartOut: 'lib/src/notification_badge_api.dart',
     dartOptions: DartOptions(),
     kotlinOut:
         'android/src/main/kotlin/com/gtirkha/notification_badge/pigeon/NotificationBadgeApi.g.kt',
