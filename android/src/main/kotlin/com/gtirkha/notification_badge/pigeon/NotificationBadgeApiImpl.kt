@@ -50,31 +50,44 @@ class NotificationBadgeApiImpl(context: Context) : NotificationBadgeApi {
         val countInt: Int = count.toInt()
         try {
             prefs.edit { putInt(badgePrefsKey, countInt) }
+
+            val allSupported = badgeProviders.filter { it.isSupported() }
+            val specificProviders = allSupported.filterNot { it is UniversalBadgeProvider }
+            val universalProvider = allSupported.filterIsInstance<UniversalBadgeProvider>().firstOrNull()
+
+            Log.d(tag, "Found ${allSupported.size} supported badge providers")
+
             var anySuccess = false
-            val supportedProviders = badgeProviders.filter { it.isSupported() }
-            Log.d(tag, "Found ${supportedProviders.size} supported badge providers")
 
-            for (provider in supportedProviders) {
+            for (provider in specificProviders) {
                 val providerName = provider.javaClass.simpleName
-                Log.d("NotificationBadgePlus", "Attempting to set badge using: $providerName")
-
+                Log.d(tag, "Attempting to set badge using: $providerName")
                 try {
                     if (provider.setBadgeCount(countInt)) {
                         anySuccess = true
-                        Log.d("NotificationBadgePlus", "Successfully set badge using $providerName")
+                        Log.d(tag, "Successfully set badge using $providerName")
                     } else {
-                        Log.w(
-                            "NotificationBadgePlus",
-                            "Failed to set badge using $providerName (returned false)"
-                        )
+                        Log.w(tag, "Failed to set badge using $providerName (returned false)")
                     }
                 } catch (e: Exception) {
-                    Log.w(
-                        "NotificationBadgePlus",
-                        "Failed to set badge using $providerName: ${e.message}"
-                    )
+                    Log.w(tag, "Failed to set badge using $providerName: ${e.message}")
                 }
             }
+
+            // UniversalBadgeProvider (notification-based) is a last resort only when
+            // no manufacturer-specific provider succeeded, to avoid unnecessary notifications.
+            if (!anySuccess && universalProvider != null) {
+                Log.d(tag, "No specific provider succeeded, falling back to UniversalBadgeProvider")
+                try {
+                    if (universalProvider.setBadgeCount(countInt)) {
+                        anySuccess = true
+                        Log.d(tag, "Successfully set badge using UniversalBadgeProvider")
+                    }
+                } catch (e: Exception) {
+                    Log.w(tag, "UniversalBadgeProvider failed: ${e.message}")
+                }
+            }
+
             Log.d(tag, "setBadgeCount completed. Success: $anySuccess")
             return callback(Result.success(anySuccess))
         } catch (_: Exception) {
