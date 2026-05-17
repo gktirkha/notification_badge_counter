@@ -1,3 +1,11 @@
+## 1.0.1
+
+**Bug fixes**
+
+* Android: notification channel is now eagerly initialized whenever `POST_NOTIFICATIONS` permission is confirmed — via `checkPermissions()`, `requestPermissions()`, or the system dialog result. Previously the channel was only created on the first `setCount()` call, which meant that if permission was granted by another package, the channel could be uninitialized and the badge silently dropped.
+
+---
+
 ## 1.0.0
 
 **Breaking changes**
