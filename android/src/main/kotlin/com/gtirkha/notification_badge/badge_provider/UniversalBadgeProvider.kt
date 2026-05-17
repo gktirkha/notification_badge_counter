@@ -1,13 +1,11 @@
 package com.gtirkha.notification_badge.badge_provider
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -15,8 +13,7 @@ import androidx.core.content.ContextCompat
 class UniversalBadgeProvider(private val context: Context) : BadgeProvider {
 
     companion object {
-        private const val CHANNEL_ID = "notification_badge_channel_v5"
-        private const val CHANNEL_NAME = "Badge Notifications"
+        private const val CHANNEL_ID = "notification_badge_channel_v7"
         private const val NOTIFICATION_ID = 0x42414447
     }
 
@@ -30,15 +27,13 @@ class UniversalBadgeProvider(private val context: Context) : BadgeProvider {
             return false
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val granted = ContextCompat.checkSelfPermission(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
                 context,
                 android.Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-
-            if (!granted) {
-                return false
-            }
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return false
         }
 
         return try {
@@ -52,7 +47,22 @@ class UniversalBadgeProvider(private val context: Context) : BadgeProvider {
                 return true
             }
 
-            val notification = buildSilentBadgeNotification(count)
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(getNotificationIcon())
+                .setContentTitle(" ")
+                .setContentText(" ")
+                .setNumber(count)
+                .setSilent(true)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+                .setShowWhen(false)
+                .setOngoing(false)
+                .setAutoCancel(false)
+                .setLocalOnly(true)
+                .setContentIntent(getLaunchIntent())
+                .build()
 
             manager.notify(NOTIFICATION_ID, notification)
 
@@ -63,67 +73,34 @@ class UniversalBadgeProvider(private val context: Context) : BadgeProvider {
         }
     }
 
-    private fun buildSilentBadgeNotification(count: Int): Notification {
-
-        val appName = context.applicationInfo
-            .loadLabel(context.packageManager)
-            .toString()
-
-        return NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(getNotificationIcon())
-            .setNumber(count)
-            .setContentTitle(appName)
-            .setContentText("")
-            .setSilent(true)
-            .setOnlyAlertOnce(true)
-            .setDefaults(0)
-            .setPriority(NotificationCompat.PRIORITY_MIN)
-            .setShowWhen(false)
-            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
-            .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .setContentIntent(getLaunchIntent())
-            .addExtras(Bundle().apply {
-                putInt("android.badgeCount", count)
-            })
-            .setAutoCancel(true)
-            .setLocalOnly(true)
-            .setForegroundServiceBehavior(
-                NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
-            )
-            .build()
-    }
-
     private fun ensureChannel() {
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            val manager = context.getSystemService(
+                Context.NOTIFICATION_SERVICE
+            ) as NotificationManager
+
+            val existing = manager.getNotificationChannel(CHANNEL_ID)
+
+            if (existing != null) {
+                return
+            }
+
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Badge",
+                NotificationManager.IMPORTANCE_MIN
+            ).apply {
+                setShowBadge(true)
+                enableLights(false)
+                enableVibration(false)
+                setSound(null, null)
+                lockscreenVisibility = android.app.Notification.VISIBILITY_SECRET
+            }
+
+            manager.createNotificationChannel(channel)
         }
-
-        val manager = context.getSystemService(
-            Context.NOTIFICATION_SERVICE
-        ) as NotificationManager
-
-        val existing = manager.getNotificationChannel(CHANNEL_ID)
-
-        if (existing != null) {
-            return
-        }
-
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_MIN
-        ).apply {
-            setShowBadge(true)
-            enableLights(false)
-            enableVibration(false)
-            vibrationPattern = longArrayOf(0)
-            setSound(null, null)
-            lockscreenVisibility = Notification.VISIBILITY_SECRET
-            description = "Used only for app icon badge count"
-        }
-
-        manager.createNotificationChannel(channel)
     }
 
     private fun getLaunchIntent(): PendingIntent? {

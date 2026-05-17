@@ -1,11 +1,17 @@
 package com.gtirkha.notification_badge.pigeon
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import com.gtirkha.notification_badge.badge_provider.BadgeProvider
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.PluginRegistry
 import com.gtirkha.notification_badge.badge_provider.HTCBadgeProvider
 import com.gtirkha.notification_badge.badge_provider.HuaweiBadgeProvider
 import com.gtirkha.notification_badge.badge_provider.LGBadgeProvider
@@ -18,11 +24,29 @@ import com.gtirkha.notification_badge.badge_provider.UniversalBadgeProvider
 import com.gtirkha.notification_badge.badge_provider.VivoBadgeProvider
 import com.gtirkha.notification_badge.badge_provider.XiaomiBadgeProvider
 
-class NotificationBadgeApiImpl(context: Context) : NotificationBadgeApi {
+class NotificationBadgeApiImpl(private val context: Context) : NotificationBadgeApi,
+    PluginRegistry.RequestPermissionsResultListener {
     private val tag: String = "NotificationBadge"
     private val prefs: SharedPreferences =
         context.getSharedPreferences("com.gtirkha.notification_badge", Context.MODE_PRIVATE)
     private val badgePrefsKey: String = "badge_count"
+
+    private var activity: Activity? = null
+    private var pendingPermissionCallback: ((Result<Boolean>) -> Unit)? = null
+
+    companion object {
+        private const val PERMISSION_REQUEST_CODE = 0x4E42_5047
+    }
+
+    fun attachToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity
+        binding.addRequestPermissionsResultListener(this)
+    }
+
+    fun detachFromActivity(binding: ActivityPluginBinding) {
+        binding.removeRequestPermissionsResultListener(this)
+        activity = null
+    }
 
     private val badgeProviders: List<BadgeProvider> = listOf(
         SamsungBadgeProvider(context),
@@ -147,11 +171,45 @@ class NotificationBadgeApiImpl(context: Context) : NotificationBadgeApi {
     }
 
     override fun checkPermissions(callback: (Result<Boolean>) -> Unit) {
-        return callback(Result.success(true))
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return callback(Result.success(true))
+        }
+        val granted = ContextCompat.checkSelfPermission(
+            context, android.Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+        callback(Result.success(granted))
     }
 
     override fun requestPermissions(callback: (Result<Boolean>) -> Unit) {
-        return callback(Result.success(true))
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return callback(Result.success(true))
+        }
+        if (ContextCompat.checkSelfPermission(
+                context, android.Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            return callback(Result.success(true))
+        }
+        val currentActivity = activity ?: return callback(Result.success(false))
+        pendingPermissionCallback = callback
+        ActivityCompat.requestPermissions(
+            currentActivity,
+            arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+            PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ): Boolean {
+        if (requestCode != PERMISSION_REQUEST_CODE) return false
+        val granted = grantResults.isNotEmpty() &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED
+        pendingPermissionCallback?.invoke(Result.success(granted))
+        pendingPermissionCallback = null
+        return true
     }
 
     override fun clearBadge(callback: (Result<Boolean>) -> Unit) {
