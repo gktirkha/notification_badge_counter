@@ -125,6 +125,28 @@ The plugin tries providers in this order and stops at the first success. The uni
 | Nova Launcher | Nova Launcher (third-party) |
 | Universal | Notification-based fallback — API 26+, requires `POST_NOTIFICATIONS` on Android 13+ |
 
+### Universal fallback & the notification in the shade
+
+When the universal provider runs, it posts a **silent, low-priority notification** to the system in order to display a badge count. This is the only mechanism Android exposes for badge counts on launchers that have no proprietary API.
+
+The notification is configured to be as unobtrusive as possible — no sound, no vibration, hidden from the lock screen — but it will still appear in the notification drawer.
+
+**The universal fallback is triggered when all of the following are true:**
+
+1. `fallbackToUniversaLAndroidBadger` is `true` (the default).
+2. Every manufacturer-specific provider either returned `false` or threw an exception — meaning none of Samsung, Xiaomi, Huawei, OPPO, Vivo, OnePlus, Sony, HTC, LG, or Nova Launcher APIs were available and succeeded.
+3. The device is running Android 8.0 (API 26) or higher.
+4. On Android 13+, the `POST_NOTIFICATIONS` permission has been granted.
+
+**Common scenarios where this happens:**
+
+- **Stock Android / Pixel devices** — no manufacturer badge API exists; the universal provider is the only option.
+- **Samsung Galaxy Tab (One UI 8+, Android 16)** — the legacy Samsung content provider (`com.sec.android.provider.badge`) is absent on newer tablets. The Samsung broadcast is sent but its result cannot be verified, so the plugin conservatively falls back to the universal provider.
+- **Third-party or custom ROMs** — manufacturer detection may not match any known provider.
+- **Any device where the launcher was replaced** — e.g. replacing the default launcher with one that has no badge support.
+
+To disable the fallback entirely and suppress the notification, set `fallbackToUniversaLAndroidBadger: false` in `setAndroidNotificationConfig`. Badge counts will silently do nothing on unsupported devices in that case.
+
 ---
 
 ## API Reference
