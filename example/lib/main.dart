@@ -29,8 +29,8 @@ class _BadgeDemoPageState extends State<BadgeDemoPage> {
   final _badge = NotificationBadgeApi();
   final _setCountController = TextEditingController();
   final _iconController = TextEditingController(text: 'ic_notification');
-  final _titleController = TextEditingController();
-  final _messageController = TextEditingController();
+  final _titleController = TextEditingController(text: 'Notification Badge Counter Example');
+  final _messageController = TextEditingController(text: 'You May Have Notifications');
   bool _fallbackToUniversal = true;
 
   int _badgeCount = 0;
