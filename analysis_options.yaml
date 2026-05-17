@@ -5,13 +5,13 @@ analyzer:
     - "**/*.freezed.dart"
 linter:
   rules:
-    - avoid_redundant_argument_values
-    - exhaustive_cases
-    - sort_constructors_first
-    - prefer_single_quotes
-    - prefer_relative_imports
-    - require_trailing_commas
-    - sort_pub_dependencies
-    - public_member_api_docs
-    - library_private_types_in_public_api
-    - dangling_library_doc_comments
+    avoid_redundant_argument_values: true
+    exhaustive_cases: true
+    sort_constructors_first: true
+    prefer_single_quotes: true
+    prefer_relative_imports: true
+    require_trailing_commas: true
+    sort_pub_dependencies: true
+    public_member_api_docs: false
+    library_private_types_in_public_api: true
+    dangling_library_doc_comments: true

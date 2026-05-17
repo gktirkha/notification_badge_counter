@@ -57,17 +57,52 @@ private open class NotificationBadgeApiPigeonCodec : StandardMessageCodec() {
 }
 
 
-/** Generated interface from Pigeon that represents a handler of messages from Flutter. */
+/**
+ * API for managing app icon badge counts on Android and iOS.
+ *
+ * On iOS, badges are set directly via `UNUserNotificationCenter`.
+ * On Android, manufacturer-specific providers are tried first; if none
+ * succeed, a silent notification-based fallback is used (configurable via
+ * [setAndroidNotificationConfig]).
+ *
+ * Generated interface from Pigeon that represents a handler of messages from Flutter.
+ */
 interface NotificationBadgeApi {
+  /** Returns `true` if at least one badge provider is available on this device. */
   fun isSupported(callback: (Result<Boolean>) -> Unit)
+  /** Sets the app icon badge to [count]. Returns `true` on success. */
   fun setCount(count: Long, callback: (Result<Boolean>) -> Unit)
+  /** Returns the current badge count stored by the plugin. */
   fun getBadgeCount(callback: (Result<Long>) -> Unit)
+  /** Clears the badge by setting the count to 0. Returns `true` on success. */
   fun clearBadge(callback: (Result<Boolean>) -> Unit)
+  /** Returns the device manufacturer string (e.g. `"samsung"`, `"Apple"`). */
   fun getDeviceManufacturer(callback: (Result<String>) -> Unit)
+  /** Increments the badge count by 1. Returns `true` on success. */
   fun incrementCount(callback: (Result<Boolean>) -> Unit)
+  /** Decrements the badge count by 1 (minimum 0). Returns `true` on success. */
   fun decrementCount(callback: (Result<Boolean>) -> Unit)
+  /** Returns `true` if the app has permission to display badge notifications. */
   fun checkPermissions(callback: (Result<Boolean>) -> Unit)
+  /**
+   * Requests permission to display badge notifications.
+   *
+   * Returns `true` if permission was granted. On Android below API 33,
+   * always returns `true`. On iOS, shows the system permission dialog.
+   */
   fun requestPermissions(callback: (Result<Boolean>) -> Unit)
+  /**
+   * Configures the notification used by the Android universal badge fallback.
+   *
+   * This is only relevant on Android. The universal fallback posts a silent,
+   * low-priority notification to display a badge count on devices where no
+   * manufacturer-specific badge API is available.
+   *
+   * - [notificationIcon]: drawable resource name in your app (default `ic_notification`).
+   * - [notificationTitle]: title shown in the notification shade. `null` renders a blank title.
+   * - [notificationMessage]: body text shown in the notification shade. `null` renders a blank body.
+   * - [fallbackToUniversaLAndroidBadger]: set to `false` to disable the fallback entirely.
+   */
   fun setAndroidNotificationConfig(notificationIcon: String, notificationTitle: String?, notificationMessage: String?, fallbackToUniversaLAndroidBadger: Boolean, callback: (Result<Boolean>) -> Unit)
 
   companion object {

@@ -86,17 +86,46 @@ class NotificationBadgeApiPigeonCodec: FlutterStandardMessageCodec, @unchecked S
 }
 
 
+/// API for managing app icon badge counts on Android and iOS.
+///
+/// On iOS, badges are set directly via `UNUserNotificationCenter`.
+/// On Android, manufacturer-specific providers are tried first; if none
+/// succeed, a silent notification-based fallback is used (configurable via
+/// [setAndroidNotificationConfig]).
+///
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol NotificationBadgeApi {
+  /// Returns `true` if at least one badge provider is available on this device.
   func isSupported(completion: @escaping (Result<Bool, Error>) -> Void)
+  /// Sets the app icon badge to [count]. Returns `true` on success.
   func setCount(count: Int64, completion: @escaping (Result<Bool, Error>) -> Void)
+  /// Returns the current badge count stored by the plugin.
   func getBadgeCount(completion: @escaping (Result<Int64, Error>) -> Void)
+  /// Clears the badge by setting the count to 0. Returns `true` on success.
   func clearBadge(completion: @escaping (Result<Bool, Error>) -> Void)
+  /// Returns the device manufacturer string (e.g. `"samsung"`, `"Apple"`).
   func getDeviceManufacturer(completion: @escaping (Result<String, Error>) -> Void)
+  /// Increments the badge count by 1. Returns `true` on success.
   func incrementCount(completion: @escaping (Result<Bool, Error>) -> Void)
+  /// Decrements the badge count by 1 (minimum 0). Returns `true` on success.
   func decrementCount(completion: @escaping (Result<Bool, Error>) -> Void)
+  /// Returns `true` if the app has permission to display badge notifications.
   func checkPermissions(completion: @escaping (Result<Bool, Error>) -> Void)
+  /// Requests permission to display badge notifications.
+  ///
+  /// Returns `true` if permission was granted. On Android below API 33,
+  /// always returns `true`. On iOS, shows the system permission dialog.
   func requestPermissions(completion: @escaping (Result<Bool, Error>) -> Void)
+  /// Configures the notification used by the Android universal badge fallback.
+  ///
+  /// This is only relevant on Android. The universal fallback posts a silent,
+  /// low-priority notification to display a badge count on devices where no
+  /// manufacturer-specific badge API is available.
+  ///
+  /// - [notificationIcon]: drawable resource name in your app (default `ic_notification`).
+  /// - [notificationTitle]: title shown in the notification shade. `null` renders a blank title.
+  /// - [notificationMessage]: body text shown in the notification shade. `null` renders a blank body.
+  /// - [fallbackToUniversaLAndroidBadger]: set to `false` to disable the fallback entirely.
   func setAndroidNotificationConfig(notificationIcon: String, notificationTitle: String?, notificationMessage: String?, fallbackToUniversaLAndroidBadger: Bool, completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
@@ -106,6 +135,7 @@ class NotificationBadgeApiSetup {
   /// Sets up an instance of `NotificationBadgeApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: NotificationBadgeApi?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+    /// Returns `true` if at least one badge provider is available on this device.
     let isSupportedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.isSupported\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       isSupportedChannel.setMessageHandler { _, reply in
@@ -121,6 +151,7 @@ class NotificationBadgeApiSetup {
     } else {
       isSupportedChannel.setMessageHandler(nil)
     }
+    /// Sets the app icon badge to [count]. Returns `true` on success.
     let setCountChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.setCount\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       setCountChannel.setMessageHandler { message, reply in
@@ -138,6 +169,7 @@ class NotificationBadgeApiSetup {
     } else {
       setCountChannel.setMessageHandler(nil)
     }
+    /// Returns the current badge count stored by the plugin.
     let getBadgeCountChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.getBadgeCount\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getBadgeCountChannel.setMessageHandler { _, reply in
@@ -153,6 +185,7 @@ class NotificationBadgeApiSetup {
     } else {
       getBadgeCountChannel.setMessageHandler(nil)
     }
+    /// Clears the badge by setting the count to 0. Returns `true` on success.
     let clearBadgeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.clearBadge\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       clearBadgeChannel.setMessageHandler { _, reply in
@@ -168,6 +201,7 @@ class NotificationBadgeApiSetup {
     } else {
       clearBadgeChannel.setMessageHandler(nil)
     }
+    /// Returns the device manufacturer string (e.g. `"samsung"`, `"Apple"`).
     let getDeviceManufacturerChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.getDeviceManufacturer\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getDeviceManufacturerChannel.setMessageHandler { _, reply in
@@ -183,6 +217,7 @@ class NotificationBadgeApiSetup {
     } else {
       getDeviceManufacturerChannel.setMessageHandler(nil)
     }
+    /// Increments the badge count by 1. Returns `true` on success.
     let incrementCountChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.incrementCount\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       incrementCountChannel.setMessageHandler { _, reply in
@@ -198,6 +233,7 @@ class NotificationBadgeApiSetup {
     } else {
       incrementCountChannel.setMessageHandler(nil)
     }
+    /// Decrements the badge count by 1 (minimum 0). Returns `true` on success.
     let decrementCountChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.decrementCount\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       decrementCountChannel.setMessageHandler { _, reply in
@@ -213,6 +249,7 @@ class NotificationBadgeApiSetup {
     } else {
       decrementCountChannel.setMessageHandler(nil)
     }
+    /// Returns `true` if the app has permission to display badge notifications.
     let checkPermissionsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.checkPermissions\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       checkPermissionsChannel.setMessageHandler { _, reply in
@@ -228,6 +265,10 @@ class NotificationBadgeApiSetup {
     } else {
       checkPermissionsChannel.setMessageHandler(nil)
     }
+    /// Requests permission to display badge notifications.
+    ///
+    /// Returns `true` if permission was granted. On Android below API 33,
+    /// always returns `true`. On iOS, shows the system permission dialog.
     let requestPermissionsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.requestPermissions\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       requestPermissionsChannel.setMessageHandler { _, reply in
@@ -243,6 +284,16 @@ class NotificationBadgeApiSetup {
     } else {
       requestPermissionsChannel.setMessageHandler(nil)
     }
+    /// Configures the notification used by the Android universal badge fallback.
+    ///
+    /// This is only relevant on Android. The universal fallback posts a silent,
+    /// low-priority notification to display a badge count on devices where no
+    /// manufacturer-specific badge API is available.
+    ///
+    /// - [notificationIcon]: drawable resource name in your app (default `ic_notification`).
+    /// - [notificationTitle]: title shown in the notification shade. `null` renders a blank title.
+    /// - [notificationMessage]: body text shown in the notification shade. `null` renders a blank body.
+    /// - [fallbackToUniversaLAndroidBadger]: set to `false` to disable the fallback entirely.
     let setAndroidNotificationConfigChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.notification_badge.NotificationBadgeApi.setAndroidNotificationConfig\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       setAndroidNotificationConfigChannel.setMessageHandler { message, reply in
