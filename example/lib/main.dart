@@ -28,6 +28,8 @@ class BadgeDemoPage extends StatefulWidget {
 class _BadgeDemoPageState extends State<BadgeDemoPage> {
   final _badge = NotificationBadgeApi();
   final _setCountController = TextEditingController();
+  final _titleController = TextEditingController(text: 'Notification Badge');
+  final _iconController = TextEditingController();
 
   int _badgeCount = 0;
   bool _hasPermission = false;
@@ -44,6 +46,8 @@ class _BadgeDemoPageState extends State<BadgeDemoPage> {
   @override
   void dispose() {
     _setCountController.dispose();
+    _titleController.dispose();
+    _iconController.dispose();
     super.dispose();
   }
 
@@ -107,6 +111,30 @@ class _BadgeDemoPageState extends State<BadgeDemoPage> {
     if (success) await _refreshCount();
     setState(
       () => _status = success ? 'Badge cleared' : 'Failed to clear badge',
+    );
+  }
+
+  Future<void> _setNotificationTitle() async {
+    final title = _titleController.text.trim();
+    if (title.isEmpty) {
+      setState(() => _status = 'Title cannot be empty');
+      return;
+    }
+    final success = await _badge.setNotificationTitle(title);
+    setState(
+      () => _status = success ? 'Notification title set' : 'Failed to set title',
+    );
+  }
+
+  Future<void> _setNotificationIcon() async {
+    final icon = _iconController.text.trim();
+    if (icon.isEmpty) {
+      setState(() => _status = 'Icon name cannot be empty');
+      return;
+    }
+    final success = await _badge.setNotificationIcon(icon);
+    setState(
+      () => _status = success ? 'Notification icon set' : 'Failed to set icon',
     );
   }
 
@@ -199,6 +227,53 @@ class _BadgeDemoPageState extends State<BadgeDemoPage> {
               ),
             ),
           ],
+          const SizedBox(height: 28),
+          Text(
+            'Notification Settings (Android)',
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Notification title',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              FilledButton.tonal(
+                onPressed: _setNotificationTitle,
+                child: const Text('Apply'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _iconController,
+                  decoration: const InputDecoration(
+                    labelText: 'Icon drawable name (e.g. ic_notification)',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              FilledButton.tonal(
+                onPressed: _setNotificationIcon,
+                child: const Text('Apply'),
+              ),
+            ],
+          ),
           if (_status.isNotEmpty) ...[
             const SizedBox(height: 20),
             Text(
